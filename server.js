@@ -8,8 +8,17 @@ dotenv.config();
 
 const app = express();
 
+// CORS Configuration
+const corsOptions = {
+  origin: ['https://iet-hyderabad-frontend.llp.trizenventures.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // MongoDB Connection
