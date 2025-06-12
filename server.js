@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/innoverse';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/IET Hyderabad Local network';
 
 mongoose.connect(MONGODB_URI)
   .then(() => {

@@ -1,7 +1,7 @@
 {
-  "name": "innoverse-backend",
+  "name": "IET Hyderabad Local network-backend",
   "version": "1.0.0",
-  "description": "Backend for InnoVerse Future Frontier",
+  "description": "Backend for IET Hyderabad Local network Future Frontier",
   "main": "server.js",
   "type": "module",
   "scripts": {
