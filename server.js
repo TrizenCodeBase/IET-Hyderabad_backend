@@ -2,92 +2,66 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import protoPlanRoutes from './routes/protoPlanRoutes.js';
-import multer from 'multer';
-import path from 'path';
 
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-// Define allowed origins
-const ALLOWED_ORIGINS = [
-  'https://iet-hyderabad-frontend.llp.trizenventures.com',
-  'http://localhost:8080',
-  'http://localhost:3000'
-];
+// Basic middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Detailed request logging
-app.use((req, res, next) => {
-  const timestamp = new Date().toISOString();
-  const origin = req.headers.origin || 'No origin';
-  console.log(`
-    [${timestamp}]
-    Method: ${req.method}
-    URL: ${req.url}
-    Origin: ${origin}
-    Headers: ${JSON.stringify(req.headers, null, 2)}
-  `);
-  next();
-});
-
-// CORS Configuration
+// CORS Configuration with detailed logging
 const corsOptions = {
   origin: function (origin, callback) {
-    // For development/testing - allow requests with no origin 
-    if (!origin) {
-      console.log('Request with no origin');
-      return callback(null, true);
-    }
-    
-    // Check against allowed origins
     const allowedOrigins = [
       'https://iet-hyderabad-frontend.llp.trizenventures.com',
       'http://localhost:3000'
     ];
-    
+
+    console.log('Incoming request from origin:', origin);
+
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      console.log('Request with no origin - allowing');
+      return callback(null, true);
+    }
+
     if (allowedOrigins.includes(origin)) {
-      console.log('Allowed origin:', origin);
+      console.log('Origin allowed:', origin);
       callback(null, true);
     } else {
-      console.log('Blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
+      console.log('Origin not allowed:', origin);
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Accept', 'Origin'],
   exposedHeaders: ['Access-Control-Allow-Origin'],
-  maxAge: 86400
 };
 
-// Apply CORS middleware BEFORE routes
+// Apply CORS middleware
 app.use(cors(corsOptions));
 
-// Add pre-flight OPTIONS handling
+// Pre-flight requests
 app.options('*', cors(corsOptions));
-
-// Add headers middleware for additional CORS support
-app.use((req, res, next) => {
-  // Debugging: Log the current origin
-  console.log('Request from origin:', req.headers.origin);
-  
-  // Ensure CORS headers are set
-  res.header('Access-Control-Allow-Credentials', 'true');
-  if (req.headers.origin) {
-    res.header('Access-Control-Allow-Origin', req.headers.origin);
-  }
-  next();
-});
 
 // Health check endpoint with detailed logging
 app.get('/health', (req, res) => {
   console.log('Health check request received:');
   console.log('- Origin:', req.headers.origin);
-  console.log('- Headers:', req.headers);
-  
-  res.status(200).json({ 
-    status: 'ok', 
+  console.log('- Headers:', JSON.stringify(req.headers, null, 2));
+
+  // Set CORS headers explicitly for health endpoint
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  res.status(200).json({
+    status: 'ok',
     timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
     headers: {
       origin: req.headers.origin,
       'access-control-allow-origin': res.getHeader('Access-Control-Allow-Origin'),
@@ -99,51 +73,36 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/protoplan', protoPlanRoutes);
 
-// 404 handler
-app.use((req, res) => {
-  console.log(`404 - Route not found: ${req.method} ${req.url}`);
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
-  });
-});
-
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error occurred:', {
     message: err.message,
+    stack: err.stack,
     origin: req.headers.origin,
     path: req.path,
     method: req.method
   });
 
-  if (err.message === 'Not allowed by CORS') {
+  // Handle CORS errors
+  if (err.message && err.message.includes('not allowed by CORS')) {
     return res.status(403).json({
       error: 'CORS Error',
-      message: 'Origin not allowed',
+      message: err.message,
       origin: req.headers.origin
     });
   }
 
+  // Handle other errors
   res.status(500).json({
     error: 'Internal Server Error',
-    message: err.message
+    message: process.env.NODE_ENV === 'development' ? err.message : 'An error occurred',
+    origin: req.headers.origin
   });
 });
 
-const PORT = process.env.PORT || 5000;
-
-const server = app.listen(PORT, () => {
-  console.log(`
-    Server is running on port ${PORT}
-    Environment: ${process.env.NODE_ENV || 'development'}
-    Allowed origins: ${JSON.stringify(ALLOWED_ORIGINS, null, 2)}
-    Timestamp: ${new Date().toISOString()}
-  `);
-});
-
-// Handle server errors
-server.on('error', (error) => {
-  console.error('Server failed to start:', error);
-  process.exit(1);
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+  console.log('Environment:', process.env.NODE_ENV || 'development');
+  console.log('Allowed origins:', corsOptions.origin);
 }); 
