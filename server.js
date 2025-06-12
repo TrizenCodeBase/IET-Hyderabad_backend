@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import protoPlanRoutes from './routes/protoPlanRoutes.js';
+import multer from 'multer';
+import path from 'path';
 
 dotenv.config();
 
@@ -48,7 +50,8 @@ const corsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  maxAge: 86400 // 24 hours
 };
 
 // Apply CORS middleware
@@ -74,11 +77,8 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+  console.log('Health check request from origin:', req.headers.origin);
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Routes
@@ -95,21 +95,17 @@ app.use((req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  const errorDetails = {
-    message: err.message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
-    timestamp: new Date().toISOString(),
-    path: req.path,
-    method: req.method,
-    origin: req.headers.origin
-  };
-
-  console.error('Server error:', errorDetails);
-
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? errorDetails : undefined
+  console.error('Error:', err);
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({
+      error: 'CORS Error',
+      message: 'Origin not allowed',
+      origin: req.headers.origin
+    });
+  }
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: err.message
   });
 });
 
