@@ -10,7 +10,7 @@ const app = express();
 
 // Basic CORS setup
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://iet-hyderabad-frontend.llp.trizenventures.com');
+    res.header('Access-Control-Allow-Origin', 'https://iethyderabad.trizenventures.com');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     res.header('Access-Control-Allow-Credentials', 'true');
@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 
 // Additional CORS setup using cors package
 app.use(cors({
-    origin: 'https://iet-hyderabad-frontend.llp.trizenventures.com',
+    origin: 'https://iethyderabad.trizenventures.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
     credentials: true,
@@ -56,7 +56,7 @@ app.use((err, req, res, next) => {
     });
     
     // Ensure CORS headers are set even for error responses
-    res.header('Access-Control-Allow-Origin', 'https://iet-hyderabad-frontend.llp.trizenventures.com');
+    res.header('Access-Control-Allow-Origin', 'https://iethyderabad.trizenventures.com');
     res.header('Access-Control-Allow-Credentials', 'true');
     
     res.status(500).json({
