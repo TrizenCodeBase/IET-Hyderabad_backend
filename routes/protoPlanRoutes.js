@@ -15,8 +15,8 @@ const upload = multer({
     }
 });
 
-const MINIO_ENDPOINT = 'lmsbackendminio-api.llp.trizenventures.com';
-const MINIO_BUCKET = 'iet-protoplant-payment'; // Default bucket name, can be changed if needed
+const MINIO_ENDPOINT = 'https://lmsbackendminio-api.llp.trizenventures.com';
+const MINIO_BUCKET = process.env.MINIO_BUCKET_NAME || 'iet-protoplant-payment';
 
 // Helper function to generate unique filename
 const generateUniqueFileName = (originalname) => {
