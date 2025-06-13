@@ -10,7 +10,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-    origin: ['https://iet-hyderabad-backend.llp.trizenventures.com'],
+    origin: ['https://iet-hyderabad-frontend.llp.trizenventures.com'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     exposedHeaders: ['Content-Type'],
