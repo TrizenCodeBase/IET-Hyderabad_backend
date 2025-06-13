@@ -19,7 +19,7 @@ const corsOptions = {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     exposedHeaders: ['Content-Type'],
-    credentials: true
+    // credentials: true
 };
 
 // Middleware
@@ -29,6 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/protoplan', protoPlanRoutes);
+app.use('/api/patn', patnRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
