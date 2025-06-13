@@ -8,12 +8,36 @@ dotenv.config();
 
 const app = express();
 
-// Simple CORS configuration
+// Basic CORS setup
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://iet-hyderabad-frontend.llp.trizenventures.com');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+
+    // Handle OPTIONS method
+    if (req.method === 'OPTIONS') {
+        return res.status(200).json({
+            body: "OK"
+        });
+    }
+
+    next();
+});
+
+// Additional CORS setup using cors package
 app.use(cors({
     origin: 'https://iet-hyderabad-frontend.llp.trizenventures.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    credentials: true
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+    credentials: true,
+    optionsSuccessStatus: 200
 }));
+
+// Handle preflight requests
+app.options('*', (req, res) => {
+    res.status(200).end();
+});
 
 // Middleware
 app.use(express.json());
@@ -30,6 +54,11 @@ app.use((err, req, res, next) => {
         stack: err.stack,
         timestamp: new Date().toISOString()
     });
+    
+    // Ensure CORS headers are set even for error responses
+    res.header('Access-Control-Allow-Origin', 'https://iet-hyderabad-frontend.llp.trizenventures.com');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    
     res.status(500).json({
         success: false,
         message: 'Something went wrong!',
