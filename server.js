@@ -8,35 +8,16 @@ dotenv.config();
 
 const app = express();
 
-// CORS configuration
+// Simple CORS configuration
 app.use(cors({
     origin: 'https://iet-hyderabad-frontend.llp.trizenventures.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true
 }));
-
-// Enable pre-flight requests for all routes
-app.options('*', cors());
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Debug middleware
-app.use((req, res, next) => {
-    // Add CORS headers directly for debugging
-    res.header('Access-Control-Allow-Origin', 'https://iet-hyderabad-frontend.llp.trizenventures.com');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    
-    console.log('Request received:', {
-        method: req.method,
-        path: req.path,
-        origin: req.get('origin'),
-        headers: req.headers
-    });
-    next();
-});
 
 // Routes
 app.use('/api/protoplan', protoPlanRoutes);
