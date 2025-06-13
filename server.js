@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import protoPlanRoutes from './routes/protoPlanRoutes.js';
+import patnRoutes from './routes/patnRoutes.js';
 
 dotenv.config();
 
@@ -9,7 +10,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-    origin: ['https://iet-hyderabad-frontend.llp.trizenventures.com'],
+    origin: ['https://iet-hyderabad-backend.llp.trizenventures.com'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     exposedHeaders: ['Content-Type'],
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/protoplan', protoPlanRoutes);
+app.use('/api/patn', patnRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -42,4 +44,4 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-}); 
+});
