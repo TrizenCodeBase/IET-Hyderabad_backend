@@ -9,37 +9,27 @@ dotenv.config();
 const app = express();
 
 // CORS configuration
-const allowedOrigins = ['https://iet-hyderabad-frontend.llp.trizenventures.com'];
-
-const corsOptions = {
-    origin: function (origin, callback) {
-        console.log('Request Origin:', origin);
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+app.use(cors({
+    origin: 'https://iet-hyderabad-frontend.llp.trizenventures.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
-    exposedHeaders: ['Content-Type'],
-    credentials: true,
-    preflightContinue: false,
-    optionsSuccessStatus: 204
-};
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    credentials: true
+}));
+
+// Enable pre-flight requests for all routes
+app.options('*', cors());
 
 // Middleware
-app.use(cors(corsOptions));
-
-// Add OPTIONS handling for preflight requests
-app.options('*', cors(corsOptions));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Debug middleware
 app.use((req, res, next) => {
-    console.log('Incoming request:', {
+    // Add CORS headers directly for debugging
+    res.header('Access-Control-Allow-Origin', 'https://iet-hyderabad-frontend.llp.trizenventures.com');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    
+    console.log('Request received:', {
         method: req.method,
         path: req.path,
         origin: req.get('origin'),
