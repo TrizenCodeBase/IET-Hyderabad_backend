@@ -8,18 +8,15 @@ dotenv.config();
 
 const app = express();
 
-// Enable CORS before any other middleware
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'https://iethyderabad.trizenventures.com');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(200);
-    }
-    next();
-});
+// ✅ Clean CORS middleware
+app.use(cors({
+    origin: 'https://iethyderabad.trizenventures.com',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+
+// ✅ OPTIONAL: make sure preflight OPTIONS handled automatically
 app.options('*', cors());
 
 // Middleware
@@ -40,7 +37,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
