@@ -9,8 +9,17 @@ dotenv.config();
 const app = express();
 
 // CORS configuration
+const allowedOrigins = ['https://iet-hyderabad-frontend.llp.trizenventures.com'];
+
 const corsOptions = {
-    origin: ['https://iet-hyderabad-frontend.llp.trizenventures.com'],
+    origin: function (origin, callback) {
+        console.log('Request Origin:', origin);
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
     exposedHeaders: ['Content-Type'],
@@ -21,8 +30,23 @@ const corsOptions = {
 
 // Middleware
 app.use(cors(corsOptions));
+
+// Add OPTIONS handling for preflight requests
+app.options('*', cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Debug middleware
+app.use((req, res, next) => {
+    console.log('Incoming request:', {
+        method: req.method,
+        path: req.path,
+        origin: req.get('origin'),
+        headers: req.headers
+    });
+    next();
+});
 
 // Routes
 app.use('/api/protoplan', protoPlanRoutes);
