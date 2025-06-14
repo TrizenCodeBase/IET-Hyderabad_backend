@@ -2,43 +2,43 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import protoPlanRoutes from './routes/protoPlanRoutes.js';
-import patnRoutes from './routes/patnRoutes.js'; 
+import patnRoutes from './routes/patnRoutes.js';
 
 dotenv.config();
 
 const app = express();
 
-// ✅ Allowed origins as array
-const allowedOrigins = [
-    'http://localhost:8081', 
-    'http://localhost:8080', 
+// ✅ Allowed origins as Set (better performance)
+const allowedOrigins = new Set([
+    'http://localhost:8081',
+    'http://localhost:8080',
     'http://localhost:3000',
-    'https://iethyderabad.trizenventures.com',
-    'https://iet-hyderabad-backend.llp.trizenventures.com'
-];
+    'https://iethyderabad.trizenventures.com'
+]);
 
-// ✅ Dynamic origin handling (most important part)
+// ✅ CORS options
 const corsOptions = {
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
+        // Allow requests with no origin (like curl, Postman, server-side requests)
+        if (!origin) {
+            return callback(null, true);
+        }
+        if (allowedOrigins.has(origin)) {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS: ' + origin));
+            callback(new Error('CORS blocked for origin: ' + origin));
         }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-    exposedHeaders: ['Content-Type'],
-    credentials: false
+    credentials: true   // <-- enable credentials if future secure cookies/tokens needed
 };
 
-// ✅ Apply CORS before any other middleware
+// ✅ Apply CORS globally
 app.use(cors(corsOptions));
-
-// ✅ Handle preflight OPTIONS requests globally
 app.options('*', cors(corsOptions));
 
-// ✅ Parse JSON body
+// ✅ Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -46,7 +46,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/protoplan', protoPlanRoutes);
 app.use('/api/patn', patnRoutes);
 
-// ✅ Error handling
+// ✅ Error handler
 app.use((err, req, res, next) => {
     console.error('Server error:', {
         message: err.message,
@@ -60,8 +60,8 @@ app.use((err, req, res, next) => {
     });
 });
 
-// ✅ Server startup
+// ✅ Start server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
