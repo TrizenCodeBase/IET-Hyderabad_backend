@@ -13,7 +13,8 @@ const allowedOrigins = new Set([
     'http://localhost:8081',
     'http://localhost:8080',
     'http://localhost:3000',
-    'https://iethyderabad.trizenventures.com'
+    'https://iethyderabad.trizenventures.com',
+    'https://iet-hyderabad-backend.llp.trizenventures.com'
 ]);
 
 // ✅ CORS options
@@ -29,9 +30,11 @@ const corsOptions = {
             callback(new Error('CORS blocked for origin: ' + origin));
         }
     },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-    credentials: true   // <-- enable credentials if future secure cookies/tokens needed
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    credentials: true,
+    maxAge: 86400 // 24 hours
 };
 
 // ✅ Apply CORS globally
