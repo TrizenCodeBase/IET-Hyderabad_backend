@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import { PutObjectCommand, HeadBucketCommand } from '@aws-sdk/client-s3';
-import { connectToDatabase, collectionName } from '../utils/db.js';
+import { connectToDatabase, collections } from '../utils/db.js';
 import minioClient from '../utils/minioClient.js';
 import crypto from 'crypto';
 
@@ -52,7 +52,7 @@ router.get('/test', (req, res) => {
 });
 
 router.post('/register', upload.single('screenshot'), async (req, res) => {
-    console.log('=== Registration Request Received ===');
+    console.log('=== ProtoPlant Registration Request Received ===');
     console.log('Headers:', req.headers);
     console.log('Body:', JSON.stringify(req.body, null, 2));
     console.log('File:', req.file);
@@ -189,7 +189,7 @@ router.post('/register', upload.single('screenshot'), async (req, res) => {
         // Connect to MongoDB and save the form data
         console.log('Connecting to MongoDB...');
         const db = await connectToDatabase();
-        const collection = db.collection(collectionName);
+        const collection = db.collection(collections.protoPlant);
 
         // Format the data similar to PATN registration but with ProtoPlanet fields
         const registrationData = {
@@ -224,13 +224,13 @@ router.post('/register', upload.single('screenshot'), async (req, res) => {
             status: 'submitted',
             registrationId: `PP-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
             lastUpdated: new Date(),
-            registrationType: 'protoPlanet'
+            registrationType: 'protoPlant'
         };
 
         // Insert into MongoDB
-        console.log('Saving registration data to collection:', collectionName);
+        console.log('Saving registration data to collection:', collections.protoPlant);
         const result = await collection.insertOne(registrationData);
-        console.log('Registration saved successfully:', {
+        console.log('ProtoPlant Registration saved successfully:', {
             registrationId: registrationData.registrationId,
             documentId: result.insertedId,
             timestamp: new Date().toISOString()
@@ -247,7 +247,7 @@ router.post('/register', upload.single('screenshot'), async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Registration error:', {
+        console.error('ProtoPlant Registration error:', {
             message: error.message,
             stack: error.stack,
             timestamp: new Date().toISOString()
@@ -269,7 +269,7 @@ router.get('/status/:registrationId', async (req, res) => {
         console.log('Checking registration status for:', registrationId);
 
         const db = await connectToDatabase();
-        const collection = db.collection(collectionName);
+        const collection = db.collection(collections.protoPlant);
         
         const registration = await collection.findOne({ registrationId });
         
