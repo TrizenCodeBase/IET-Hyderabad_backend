@@ -16,7 +16,8 @@ const corsOptions = {
         'http://localhost:8080', 
         'http://localhost:3000',
         'https://iethyderabad.trizenventures.com',  // Production frontend
-        'https://iet-hyderabad-backend.llp.trizenventures.com'  // Production backend (for self-requests)
+        'https://iet-hyderabad-backend.llp.trizenventures.com',
+        'https://iethlnevents.in'// Production backend (for self-requests)
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
