@@ -9,7 +9,8 @@ const dbName = process.env.MONGODB_DB || 'test';
 // Export collection names for different registration types
 export const collections = {
     protoPlant: process.env.PROTOPLANT_COLLECTION || 'iet-protoplant-registrations',
-    patn: process.env.PATN_COLLECTION || 'patn-registrations'
+    patn: process.env.PATN_COLLECTION || 'patn-registrations',
+    innothon: process.env.INNOTHON_COLLECTION || 'innothon-registrations'
 };
 
 let client;
